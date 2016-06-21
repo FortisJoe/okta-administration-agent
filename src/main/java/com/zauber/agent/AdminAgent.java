@@ -47,7 +47,7 @@ public class AdminAgent {
             AdminAgent agent = new AdminAgent();
             agent.runAgent();
         } catch (IOException e) {
-            //TODO - Deal with it
+            LOGGER.error("Failed to load Admin Agent Properties", e);
         }
     }
 
