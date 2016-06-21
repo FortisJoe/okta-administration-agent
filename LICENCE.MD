@@ -212,4 +212,6 @@
 
    Apache HttpClient 4.3.6 http://hc.apache.org/httpcomponents-client-ga/index.html http://hc.apache.org/httpcomponents-client-ga/license.html
 
+   Apache Commons Lang3 3.4 https://commons.apache.org/proper/commons-lang/ http://www.apache.org/licenses/LICENSE-2.0
+
    TestNG 6.8.17 http://testng.org/ http://testng.org/license/
