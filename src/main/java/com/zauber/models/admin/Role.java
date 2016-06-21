@@ -4,7 +4,7 @@ import com.okta.sdk.framework.ApiObject;
 import org.joda.time.DateTime;
 
 /**
- * Created by Zauber Ltd on 21/06/2016.
+ * Representation of a Role
  */
 public class Role extends ApiObject {
 

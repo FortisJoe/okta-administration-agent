@@ -1,7 +1,7 @@
 package com.zauber.domain;
 
 /**
- * Created by Zauber Ltd on 21/06/2016.
+ * Representation of an okta instance
  */
 public class OktaServer {
 

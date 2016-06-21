@@ -3,7 +3,7 @@ package com.zauber.models.admin;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * Created by Zauber Ltd on 21/06/2016.
+ * Representation of a role type
  */
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum RoleType {

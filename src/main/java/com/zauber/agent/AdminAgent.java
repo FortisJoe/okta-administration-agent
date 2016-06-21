@@ -12,23 +12,34 @@ import com.zauber.domain.OktaServer;
 import com.zauber.models.admin.Role;
 import com.zauber.models.admin.RoleType;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
 /**
- * Created by Zauber Ltd on 21/06/2016.
+ * Admin Agent Class - Runs against a number of Okta Servers and manages Admin roles on each according to group membership.
  */
 public class AdminAgent {
 
-    private  List<OktaServer> servers;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminAgent.class);
+
+    private List<OktaServer> servers;
+
     private String readOnlyAdminGroupName;
+
     private String mobileAdminGroupName;
+
     private String userAdminGroupName;
+
     private String appAdminGroupName;
+
     private String orgAdminGroupName;
+
     private String superAdminGroupName;
+
     private Set<String> whitelistedUsers;
 
     public static void main(String[] args) {
@@ -40,7 +51,11 @@ public class AdminAgent {
         }
     }
 
-    public AdminAgent() throws IOException {
+    /**
+     * AdminAgent()
+     * @throws IOException Exception if properties cannot be found
+     */
+    private AdminAgent() throws IOException {
         Properties properties = loadProperties();
         servers = getOktaServers(properties);
         readOnlyAdminGroupName = properties.getProperty("okta.readonlyadmin.group");
@@ -52,7 +67,11 @@ public class AdminAgent {
         whitelistedUsers = getWhiteListedUsers(properties);
     }
 
-    public void runAgent()  {
+    /**
+     * runAgent()
+     * Runs against a number of Okta Servers and manages Admin roles on each according to group membership.
+     */
+    private void runAgent()  {
         for (OktaServer server : servers) {
             ApiClientConfiguration config = new ApiClientConfiguration(server.getUrl(), server.getApiKey());
             try {
@@ -68,11 +87,11 @@ public class AdminAgent {
                             provisionRoleMembership(config, user, RoleType.READ_ONLY_ADMIN);
                             removeUserFromRoleToUserMap(roleTypeToUsersMap, user);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision Read Only Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get Read Only Admin Role Group for group name " + readOnlyAdminGroupName, e);
                 }
 
                 // Mobile Admins
@@ -82,11 +101,11 @@ public class AdminAgent {
                         try {
                             provisionRoleMembership(config, user, RoleType.MOBILE_ADMIN);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision Mobile Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get Mobile Admin Role Group for group name " + mobileAdminGroupName, e);
                 }
 
                 // User Admin
@@ -96,11 +115,11 @@ public class AdminAgent {
                         try {
                             provisionRoleMembership(config, user, RoleType.USER_ADMIN);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision User Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get User Admin Role Group for group name " + userAdminGroupName, e);
                 }
 
                 // App Admin
@@ -110,11 +129,11 @@ public class AdminAgent {
                         try {
                             provisionRoleMembership(config, user, RoleType.APP_ADMIN);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision App Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get App Admin Role Group for group name " + appAdminGroupName, e);
                 }
 
                 //Org Admin
@@ -124,11 +143,11 @@ public class AdminAgent {
                         try {
                             provisionRoleMembership(config, user, RoleType.ORG_ADMIN);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision Org Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get Org Admin Role Group for group name " + orgAdminGroupName, e);
                 }
 
                 //Super Admins
@@ -138,11 +157,11 @@ public class AdminAgent {
                         try {
                             provisionRoleMembership(config, user, RoleType.SUPER_ADMIN);
                         } catch (IOException e) {
-                            //TODO - Deal with it
+                            LOGGER.error("Could not provision Super Admin Role correctly on " + server.getName(), e);
                         }
                     }
                 } catch (IOException e) {
-                    //TODO - Deal with it
+                    LOGGER.error("On " + server.getName() + " Could not get Super Admin Role Group for group name " + superAdminGroupName, e);
                 }
 
                 //Remaining users have admin roles they should not have (unless they are whitelisted)
@@ -154,14 +173,14 @@ public class AdminAgent {
                             try {
                                 deprovisionRoleMembership(config, user, type);
                             } catch (IOException e) {
-                                //TODO - Deal with it
+                                LOGGER.error("Could not deprovision " + user.getProfile().getLogin() + " from role type " + type.getType() + " on " + server.getName(), e);
                             }
                         }
                     }
 
                 }
             } catch (IOException e) {
-                //TODO - Deal with it
+                LOGGER.error("Could not get list of existing Administrators from " + server.getName() + ", skipping this server.");
             }
         }
     }
@@ -295,7 +314,7 @@ public class AdminAgent {
                         }
                     }
                     catch (IllegalArgumentException e){
-                        //TODO - Log?
+                        LOGGER.error("Unexpected Role Type: " + role.getType(), e);
                     }
 
                 }
